@@ -65,6 +65,7 @@ class Enemy():
         self.rect.x -= dx * self.speed
         self.rect.y -= dy * self.speed
 
+# class for the star
 class Star():
     def __init__(self):
         self.start_x = random.randint(0, width)
@@ -82,6 +83,8 @@ def main():
     star = Star()
     star_counter = 0
     power_ups = ['speed', 'attack']
+    speed = 0
+    attack = False
     clock = pygame.time.Clock()
 
     # game loop
@@ -102,6 +105,10 @@ def main():
             player.goUp()
         elif key[pygame.K_s]:
             player.goDown()
+        elif key[pygame.K_SPACE]:
+            if attack:
+               enemies.pop()
+               attack = False 
 
         for i in range(len(enemies)):
             # if the enemy collides with the player end the game
@@ -115,26 +122,53 @@ def main():
         if player.rect.colliderect(star.rect):
             star = Star()
             star_counter += 1
+            
             # every 5 stars create a new enemy
             if star_counter % 5 == 0:
                 enemies.append(Enemy())
+            
             # every 10 stars give player a power up
             if star_counter % 10 == 0:
-                player.dx += 10
-                player.dy += 10
+                power_up = random.choice(power_ups)
+                if power_up == 'speed':
+                    if player.dx < 20:
+                        player.dx += 2
+                        player.dy += 2
+                        speed += 1
+                else:
+                    attack = True
 
-       
-        # star counter
+        # text
         star_counter_display = font.render('Stars: ' + str(star_counter), True, white)
         star_counter_display_rect = star_counter_display.get_rect()
+        
+        if speed == 5:
+            speed_display = font.render('Speed: Max', True, white )
+        else:
+            speed_display = font.render('Speed: ' + str(speed), True, white )
+        speed_display_rect = speed_display.get_rect()
+        speed_display_rect.x = 1000
+        
+        if attack:
+            attack_display = font.render('Attack: Ready!', True, white)
+        else:
+            attack_display = font.render('Attack: Not Ready', True, white)
+        attack_display_rect = attack_display.get_rect()
+        attack_display_rect.x = 1000
+        attack_display_rect.y = 100
+
         
         # display images 
         screen.blit(background, (0, 0))
         screen.blit(star.icon, star.rect)
         screen.blit(player.icon, player.rect)
+        
         for i in range(len(enemies)):
             screen.blit(enemies[i].icon, enemies[i].rect)
+        
         screen.blit(star_counter_display, star_counter_display_rect)
+        screen.blit(speed_display, speed_display_rect)
+        screen.blit(attack_display, attack_display_rect)
 
         # update display at 60fps
         pygame.display.flip()
