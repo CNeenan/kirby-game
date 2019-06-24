@@ -105,6 +105,8 @@ def main():
             player.goUp()
         elif key[pygame.K_s]:
             player.goDown()
+        
+        # attack
         elif key[pygame.K_SPACE]:
             if attack:
                enemies.pop()
